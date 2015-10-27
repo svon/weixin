@@ -64,7 +64,7 @@ var Msg = function(message){
 module.exports = function (app, exress) {
  	app.use('/wechat', wechat(config, function (req, res, next) {
 	  // 微信输入信息都在req.weixin上
-	  var res = Msg(req.weixin);
+	  var data = Msg(req.weixin);
 	  // if (message.FromUserName === 'diaosi') {
 	  //   // 回复屌丝(普通回复)
 	  //   res.reply('hehe');
@@ -101,8 +101,8 @@ module.exports = function (app, exress) {
 	  //     }
 	  //   ]);
 	  // }
-	  console.log("server : ",res);
-	  res.reply(res);
+	  console.log("server : ",data);
+	  res.reply(data);
 	}));
 	console.log("wechat ready");
 };
