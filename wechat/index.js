@@ -25,7 +25,7 @@ var Msg = function(message){
 	switch(message.MsgType){
 		//文本消息
 		case "text":
-			res = require("./msg_txt.js")();
+			res = require("./msg_txt.js")(message);
 			break;
 		//图片消息
 		case "image":
