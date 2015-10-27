@@ -5,6 +5,13 @@
 var path = require("path");
 var fs = require("fs");
 
+var wechat = require('wechat');
+var config = {
+  token: 'wx_nodejs_so',
+  appid: 'wx116353cb702a6584',
+  encodingAESKey: 'JPrNa6xruZkOLtYeMQddcs8t5oWVRuhmUPcJGnxtoHc'
+};
+
 var Msg = function(message){
 // ToUserName	开发者微信号
 // FromUserName	发送方帐号（一个OpenID）
@@ -96,4 +103,5 @@ module.exports = function (app, exress) {
 	  // }
 	  	res.reply(res);
 	}));
+	console.log("wechat ready");
 };

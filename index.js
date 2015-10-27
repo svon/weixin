@@ -23,17 +23,12 @@
 // }();
 
 var express = require('express');
-var wechat = require('wechat');
+
 var app = express();
-var config = {
-  token: 'wx_nodejs_so',
-  appid: 'wx116353cb702a6584',
-  encodingAESKey: 'JPrNa6xruZkOLtYeMQddcs8t5oWVRuhmUPcJGnxtoHc'
-};
 app.use(express.query());
 
 
-
+require('./wechat/index.js')(app, express);
 require('./routes/routes.js')(app, express);
 var http = require('http').Server(app);
 http.listen(8000, "0.0.0.0", function () {
