@@ -32,5 +32,5 @@ module.exports = function (message) {
 			text = '我是否不知道你要干嘛，可以试试点击<a href="http://svon.org">http://svon.org</a>'
 			break;
 	}
-	return text;
+	return {type: "text", content: text};
 }

@@ -14,6 +14,7 @@ var Msg = function(message){
 // MsgId   消息id，64位整型
 
 	var res = null;
+	console.log(message);
 	switch(message.MsgType){
 		//文本消息
 		case "text":
