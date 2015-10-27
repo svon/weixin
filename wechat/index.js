@@ -101,7 +101,8 @@ module.exports = function (app, exress) {
 	  //     }
 	  //   ]);
 	  // }
-	  	res.reply(res);
+	  console.log("server : ",res);
+	  res.reply(res);
 	}));
 	console.log("wechat ready");
 };
