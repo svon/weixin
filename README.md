@@ -1,2 +1,3 @@
 # weixin
-test
+
+http://wx.nodejs.so
