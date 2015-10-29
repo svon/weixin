@@ -105,4 +105,6 @@ module.exports = function (app, exress) {
 	  res.reply(data);
 	}));
 	console.log("wechat ready");
+	require("./config.js")(app);
+	
 };
