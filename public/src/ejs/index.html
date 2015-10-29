@@ -10,15 +10,13 @@
     <div id="json"></div>
     <script type="text/javascript">
     $(function() {
-        $.ajax({
-            url: '//wx.nodejs.so/config',
-            type: 'post',
-            dataType: 'json',
-            data: {
-                url: location.href.split('#')[0]
-            }
-        }).done(function(resp) {
-            wx.config({
+    	$.get(
+    		"/config",
+    		{
+    			url: location.href.split('#')[0]
+    		},
+    		function(resp){
+    			wx.config({
 		        debug: true,
 		        appId: resp.appid,
 		        timestamp: resp.timestamp,
@@ -48,7 +46,8 @@
 		        wx.onMenuShareQQ(shareData);
 		        wx.onMenuShareWeibo(shareData);
 		    });
-        });
+			}
+		);
     });
     </script>
 </body>

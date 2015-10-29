@@ -35,7 +35,7 @@ module.exports = function(app) {
 
     // 2小时后过期，需要重新获取数据后计算签名
     var expireTime = 7200 - 100;
-  
+
     var getAppsInfo = require('./info.js'); // 从外部加载app的配置信息
     var appIds = getAppsInfo();
     /**
@@ -59,9 +59,10 @@ module.exports = function(app) {
 
     // 获取微信签名所需的ticket
     var getTicket = function(url, index, res, accessData) {
-    	console.log(url,accessData);
+        console.log(url, accessData);
         https.get('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' + accessData.access_token + '&type=jsapi', function(_res) {
-            var str = '', resp;
+            var str = '',
+                resp;
             _res.on('data', function(data) {
                 str += data;
             });
@@ -83,13 +84,27 @@ module.exports = function(app) {
     };
 
     // 通过请求中带的index值来判断是公司运营的哪个公众平台
-    app.post('/config', function(req, res) {
-    	console.log("---------------------------------------------------------");
-        var body = req.body || {};
+    function config(req, res) {
+        console.log("---------------------------------------------------------");
+        var getdata = function() {
+            var data = req.query || {},
+                body = req.body || {},
+                params = req.params || {};
+            for (var key in body) {
+                data[key] = body[key];
+            }
+            for (var key in params) {
+                data[key] = params[key];
+            }
+            return data;
+        };
+        var body = getdata();
+        console.log(body);
         var index = 0;
         // 获取微信签名所需的access_token
         https.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + appIds[index].appid + '&secret=' + appIds[index].secret, function(_res) {
-            var str = '', resp;
+            var str = '',
+                resp;
             _res.on('data', function(data) {
                 str += data;
             });
@@ -98,6 +113,7 @@ module.exports = function(app) {
                 getTicket(body['url'], index, res, resp);
             });
         });
-    });
+    };
+    app.route('/config').get(config);
     console.log("config ready");
 };
