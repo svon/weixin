@@ -5,9 +5,8 @@ var post = function(index) {
         method: "post",
         host: "127.0.0.1",
         port: "8000",
-        path: "/wechat/config"
+        path: "/config"
     };
-    console.log(opt);
     var req = http.request(opt, function(res) {
         res.setEncoding('utf8');
         var str = '',
@@ -16,7 +15,6 @@ var post = function(index) {
             str += chunk;
         });
         res.on("end", function() {
-            console.log('return ticket:  ' + str);
             try {
                 resp = JSON.parse(str);
                 console.log(resp);
