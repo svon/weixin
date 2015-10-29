@@ -124,10 +124,10 @@ module.exports = function(app){
 
 	// 通过请求中带的index值来判断是公司运营的哪个公众平台
 	app.post('/wechat/config', function(req, res) {
+		console.log("req.body : ",req.body);
 		var index = req.params.index;
 		var _url = req.body.url;
 		var signatureObj = cachedSignatures[_url];
-		console.log("body : ",req.body);
 		if(!_url){
 			return errorRender(res, '缺少url参数');
 		}
