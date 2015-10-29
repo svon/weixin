@@ -14,7 +14,7 @@
 	                url: location.href.split('#')[0]
 	            }
 	        }).done(function(resp){
-        		$("#json").append(resp);
+        		$("#json").append(JSON.stringify(resp));
         	});
 		});
 		</script>

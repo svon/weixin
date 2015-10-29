@@ -26,7 +26,7 @@ var express = require('express');
 
 var app = express();
 app.use(express.query());
-
+require('./config/environment.js')(app, express);
 
 require('./wechat/index.js')(app, express);
 require('./routes/routes.js')(app, express);
