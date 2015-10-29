@@ -6,8 +6,8 @@
 module.exports = function(){
 	return [
 		{
-			appid: 'wx116353cb702a6584',
-			secret: '9eea66450c86ddae25cf1b63734f3103'
+			appid: 'wx916ac337bf3c3c22',
+			secret: '382dd0502bea061e8329ff7c1e83e7dc'
 		}
 	];
 };
