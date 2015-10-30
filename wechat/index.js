@@ -8,7 +8,7 @@ var fs = require("fs");
 var wechat = require('wechat');
 var config = {
   token: 'wx_nodejs_so',
-  appid: 'wx116353cb702a6584',
+  appid: 'wx916ac337bf3c3c22',
   encodingAESKey: 'JPrNa6xruZkOLtYeMQddcs8t5oWVRuhmUPcJGnxtoHc'
 };
 
