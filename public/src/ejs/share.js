@@ -23,7 +23,7 @@ $(function() {
                 var shareData = {
                     title: '在路上',
                     desc: '在路上、博客',
-                    link: 'http://svon.org',
+                    link: 'http://wx.nodejs.so',
                     imgUrl: "http://static.nodejs.so/sns.png",
                     success: function() {
 
