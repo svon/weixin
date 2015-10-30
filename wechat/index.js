@@ -6,12 +6,8 @@ var path = require("path");
 var fs = require("fs");
 
 var wechat = require('wechat');
-var config = {
-  token: 'wx_nodejs_so',
-  appid: 'wx916ac337bf3c3c22',
-  encodingAESKey: 'JPrNa6xruZkOLtYeMQddcs8t5oWVRuhmUPcJGnxtoHc'
-};
-
+var config = require('./info.js')()[0]; // 从外部加载app的配置信息
+console.log("config : ",config);
 var Msg = function(message){
 // ToUserName	开发者微信号
 // FromUserName	发送方帐号（一个OpenID）

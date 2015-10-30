@@ -7,6 +7,7 @@ module.exports = function(){
 	return [
 		{
 			appid: 'wx916ac337bf3c3c22',
+			token: 'wx_nodejs_so',
 			secret: '382dd0502bea061e8329ff7c1e83e7dc'
 		}
 	];
