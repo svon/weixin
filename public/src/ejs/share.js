@@ -5,7 +5,7 @@ $(function() {
         },
         function(resp) {
             wx.config({
-                debug: true,
+                debug: false,
                 appId: resp.appid,
                 timestamp: resp.timestamp,
                 nonceStr: resp.nonceStr,
