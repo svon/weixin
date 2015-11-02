@@ -7,7 +7,6 @@ var fs = require("fs");
 
 var wechat = require('wechat');
 var config = require('./info.js')()[0]; // 从外部加载app的配置信息
-console.log("config : ", config);
 var Msg = function(message) {
     // ToUserName	开发者微信号
     // FromUserName	发送方帐号（一个OpenID）
@@ -17,7 +16,6 @@ var Msg = function(message) {
     // MsgId   消息id，64位整型
 
     var res = null;
-    console.log(message);
     switch (message.MsgType) {
         //文本消息
         case "text":
@@ -79,12 +77,11 @@ var Msg = function(message) {
 
 var WechatAPI  = require('wechat-api');
 module.exports = function(app, exress) {
-    var api = new WechatAPI(config.appid, config.secret);
-    var menu = require('./wechat-menu.js')();
-    console.log("menu : ", menu)
-    api.createMenu(menu, function(err,result){
-    	console.log(err,result);
-    });
+    //var api = new WechatAPI(config.appid, config.secret);
+    //var menu = require('./wechat-menu.js')();
+    //api.createMenu(menu, function(err,result){
+    //	console.log(err,result);
+    //});
     app.use('/wechat', wechat(config, function(req, res, next) {
         // 微信输入信息都在req.weixin上
         var data = Msg(req.weixin);
