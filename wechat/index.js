@@ -72,8 +72,7 @@ var Msg = function(message) {
             break;
     }
     return res;
-}
-
+};
 
 var WechatAPI  = require('wechat-api');
 module.exports = function(app, exress) {
@@ -90,5 +89,4 @@ module.exports = function(app, exress) {
     }));
     console.log("wechat ready");
     require("./config.js")(app);
-
 };

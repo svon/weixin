@@ -19,25 +19,31 @@ module.exports = function (app) {
         res.set({
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "POST,GET",
-            "Access-Control-Allow-Credentials": "true"
+            "Access-Control-Allow-Credentials": "true",
+            "Content-Type": "text/javascript; charset=utf-8"
         });
         var share = function (file) {
             var array = [
                 '(function(){',
                 file,
-                '})('+JSON.stringify(data)+')'
+                '})(' + JSON.stringify(data) + ')'
             ];
             return array.join("");
         };
-        fs.readFile(path.join(StaticRoot, "./share.js"),"utf-8", function (err, file) {
-            if (err) {
-                console.log(err);
-            } else {
-                res.send(share(file));
-            }
-        });
-
-
+        var fileshare;
+        if (fileshare) {
+            res.send(share(fileshare));
+        }
+        else {
+            fs.readFile(path.join(StaticRoot, "./share.js"), "utf-8", function (err, file) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    fileshare = file;
+                    res.send(share(file));
+                }
+            });
+        }
     };
 
     // 随机字符串产生函数
@@ -115,6 +121,8 @@ module.exports = function (app) {
             return data;
         };
         var body = getdata();
+        var headers = req.headers;
+        body['url'] ? true : (body['url'] = headers['referer']);
         console.log(body);
         var index = 0;
         // 获取微信签名所需的access_token
@@ -130,6 +138,6 @@ module.exports = function (app) {
             });
         });
     };
-    app.route('/config').get(config);
+    app.route('/config/wechat.js').get(config);
     console.log("config ready");
 };
