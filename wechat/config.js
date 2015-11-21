@@ -163,7 +163,7 @@ module.exports = function(app) {
             });
             _res.on('end', function() {
                 resp = JSON.parse(str);
-                getTicket(body['url'], index, res, resp);
+                getTicket(url, index, res, resp);
             });
         });
     };
