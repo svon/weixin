@@ -100,14 +100,16 @@ module.exports = function(app) {
                     nonceStr: nonceStr,
                     timestamp: ts,
                     appid: appid,
-                    signature: signature
+                    signature: signature,
+                    url: url
                 };
 
                 responseWithJson(res, {
                     nonceStr: nonceStr,
                     timestamp: ts,
                     appid: appid,
-                    signature: signature
+                    signature: signature,
+                    url: url
                 });
             });
         });
@@ -148,7 +150,7 @@ module.exports = function(app) {
                     url: signatureObj.url
                 });
             } else {
-                delete cachedSignatures[body['url']];
+                delete cachedSignatures[url];
             }
         }
         var index = 0;
