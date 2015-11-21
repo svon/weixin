@@ -12,6 +12,14 @@ var querystring = require('querystring');
 var fs = require('fs');
 var path = require("path");
 var StaticRoot = path.join(__dirname, "./");
+var crypto = require("crypto");
+function md5(data) {
+    var Buffer = require("buffer").Buffer;
+    var buf = new Buffer(data);
+    var str = buf.toString("binary");
+    return "md5_"+crypto.createHash("md5").update(str).digest("hex");
+}
+
 module.exports = function(app) {
     var cachedSignatures = {};
     // 输出数字签名对象
@@ -96,7 +104,7 @@ module.exports = function(app) {
                 var ticket = resp.ticket;
                 var signature = calcSignature(ticket, nonceStr, ts, url);
 
-                cachedSignatures[url] = {
+                cachedSignatures[md5(url)] = {
                     nonceStr: nonceStr,
                     timestamp: ts,
                     appid: appid,
@@ -133,7 +141,7 @@ module.exports = function(app) {
         var body = getdata();
         var headers = req.headers;
         var url =  body['url'] || headers['referer'];
-        var signatureObj = cachedSignatures[url] || null;
+        var signatureObj = cachedSignatures[md5(url)] || null;
         console.log("url : ",url);
         console.log("cache : ",signatureObj);
         // 如果缓存中已存在签名，则直接返回签名
@@ -141,7 +149,7 @@ module.exports = function(app) {
             var t = createTimeStamp() - signatureObj.timestamp;
             // 未过期，并且访问的是同一个地址
             // 判断地址是因为微信分享出去后会额外添加一些参数，地址就变了不符合签名规则，需重新生成签名
-            if (t < expireTime && signatureObj.url == _url) {
+            if (t < expireTime && signatureObj.url == url) {
                 return responseWithJson(res, {
                     nonceStr: signatureObj.nonceStr,
                     timestamp: signatureObj.timestamp,
