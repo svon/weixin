@@ -131,8 +131,9 @@ module.exports = function(app) {
         var body = getdata();
         var headers = req.headers;
         body['url'] ? true : (body['url'] = headers['referer']);
-
         var signatureObj = cachedSignatures[body['url']];
+        console.log(body['url'],signatureObj);
+        console.log("cache",signatureObj);
         // 如果缓存中已存在签名，则直接返回签名
         if (signatureObj && signatureObj.timestamp) {
             var t = createTimeStamp() - signatureObj.timestamp;
