@@ -11,6 +11,7 @@ var fs = require('fs');
 var path = require("path");
 var StaticRoot = path.join(__dirname, "./");
 var crypto = require("crypto");
+var base64 = require("./base64.js");
 
 function md5(data) {
     var Buffer = require("buffer").Buffer;
@@ -19,7 +20,7 @@ function md5(data) {
     return "md5_" + crypto.createHash("md5").update(str).digest("hex");
 }
 
-module.exports = function(app,api) {
+module.exports = function(app, api) {
     var cachedSignatures = {};
     // 输出数字签名对象
     var responseWithJson = function(res, data) {
@@ -61,7 +62,6 @@ module.exports = function(app,api) {
     };
     // 通过请求中带的index值来判断是公司运营的哪个公众平台
     function config(req, res) {
-        console.log("---------------------------------------------------------");
         var getdata = function() {
             var data = req.query || {},
                 body = req.body || {},
@@ -76,14 +76,33 @@ module.exports = function(app,api) {
         };
         var body = getdata();
         var headers = req.headers;
-
         var url = body['url'] || headers['referer'];
-        if(!url){
-            url  = "http://" + req.headers.host + req.originalUrl;
+        if (!url) {
+            url = "http://" + req.headers.host + req.originalUrl;
         }
-        console.log("url : ", url);
+        if (body.encode) {
+            url = base64.decode(url);
+        }
         var signatureObj = cachedSignatures[md5(url)] || null;
-        console.log("cache : ", signatureObj);
+        var create = function() {
+            api.getJsConfig({
+                debug: false,
+                jsApiList: [
+                    'checkJsApi',
+                    'onMenuShareTimeline',
+                    'onMenuShareAppMessage',
+                    'onMenuShareQQ',
+                    'onMenuShareWeibo'
+                ],
+                url: url
+            }, function(err, result) {
+                result.ts = createTimeStamp();
+                result.url = url;
+                cachedSignatures[md5(url)] = result;
+                responseWithJson(res, result);
+            });
+        };
+
         // 如果缓存中已存在签名，则直接返回签名
         if (signatureObj && signatureObj.ts) {
             var t = createTimeStamp() - signatureObj.ts;
@@ -93,23 +112,13 @@ module.exports = function(app,api) {
                 return responseWithJson(res, signatureObj);
             } else {
                 delete cachedSignatures[url];
+                create();
             }
         }
-        api.getJsConfig({
-            debug: false,
-            jsApiList: [
-                'checkJsApi',
-                'onMenuShareTimeline',
-                'onMenuShareAppMessage',
-                'onMenuShareQQ',
-                'onMenuShareWeibo'
-            ],
-            url: url
-        }, function(err, result) {
-            result.ts =  createTimeStamp();
-            cachedSignatures[md5(url)] = result;
-            responseWithJson(res, result);
-        });
+        else{
+            create();
+        }
+
     };
     app.route('/config/wechat.js').get(config);
     console.log("config ready");
