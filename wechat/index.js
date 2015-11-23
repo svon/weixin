@@ -8,11 +8,11 @@ var fs = require("fs");
 var wechat = require('wechat');
 var config = require('./info.js')()[0]; // 从外部加载app的配置信息
 var Msg = function(message) {
-    // ToUserName	开发者微信号
-    // FromUserName	发送方帐号（一个OpenID）
-    // CreateTime	消息创建时间 （整型）
-    // MsgType	text
-    // Content	文本消息内容
+    // ToUserName   开发者微信号
+    // FromUserName 发送方帐号（一个OpenID）
+    // CreateTime   消息创建时间 （整型）
+    // MsgType  text
+    // Content  文本消息内容
     // MsgId   消息id，64位整型
 
     var res = null;
@@ -74,13 +74,14 @@ var Msg = function(message) {
     return res;
 };
 
-var WechatAPI  = require('wechat-api');
+var WechatAPI = require('wechat-api');
 module.exports = function(app, exress) {
-    //var api = new WechatAPI(config.appid, config.secret);
+    api = new WechatAPI(config.appid, config.secret);
     //var menu = require('./wechat-menu.js')();
     //api.createMenu(menu, function(err,result){
-    //	console.log(err,result);
+    //  console.log(err,result);
     //});
+
     app.use('/wechat', wechat(config, function(req, res, next) {
         // 微信输入信息都在req.weixin上
         var data = Msg(req.weixin);
@@ -88,5 +89,5 @@ module.exports = function(app, exress) {
         res.reply(data);
     }));
     console.log("wechat ready");
-    require("./config.js")(app);
+    require("./config.js")(app,api);
 };

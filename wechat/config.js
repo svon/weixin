@@ -5,22 +5,21 @@
  * time: 2015-1-27
  */
 
-var http = require("http");
-var https = require("https");
-var jsSHA = require('jssha');
+
 var querystring = require('querystring');
 var fs = require('fs');
 var path = require("path");
 var StaticRoot = path.join(__dirname, "./");
 var crypto = require("crypto");
+
 function md5(data) {
     var Buffer = require("buffer").Buffer;
     var buf = new Buffer(data);
     var str = buf.toString("binary");
-    return "md5_"+crypto.createHash("md5").update(str).digest("hex");
+    return "md5_" + crypto.createHash("md5").update(str).digest("hex");
 }
 
-module.exports = function(app) {
+module.exports = function(app,api) {
     var cachedSignatures = {};
     // 输出数字签名对象
     var responseWithJson = function(res, data) {
@@ -54,75 +53,12 @@ module.exports = function(app) {
         }
     };
 
-    // 随机字符串产生函数
-    var createNonceStr = function() {
-        return Math.random().toString(36).substr(2, 15);
-    };
-
+    // 2小时后过期，需要重新获取数据后计算签名
+    var expireTime = 7200 - 100;
     // 时间戳产生函数
     var createTimeStamp = function() {
         return parseInt(new Date().getTime() / 1000) + '';
     };
-
-    // 2小时后过期，需要重新获取数据后计算签名
-    var expireTime = 7200 - 100;
-
-    var getAppsInfo = require('./info.js'); // 从外部加载app的配置信息
-    var appIds = getAppsInfo();
-    /**
-     缓存在服务器的每个URL对应的数字签名对象
-     {
-         'http://game.4gshu.com/': {
-             appid: 'wxa0f06601f194xxxx'
-             ,secret: '097fd14bac218d0fb016d02f525dxxxx'
-             ,timestamp: '1421135250'
-             ,noncestr: 'ihj9ezfxf26jq0k'
-         }
-     }
-     */
-
-    // 计算签名
-    var calcSignature = function(ticket, noncestr, ts, url) {
-        var str = 'jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp=' + ts + '&url=' + url;
-        shaObj = new jsSHA(str, 'TEXT');
-        return shaObj.getHash('SHA-1', 'HEX');
-    }
-
-    // 获取微信签名所需的ticket
-    var getTicket = function(url, index, res, accessData) {
-        https.get('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' + accessData.access_token + '&type=jsapi', function(_res) {
-            var str = '',
-                resp;
-            _res.on('data', function(data) {
-                str += data;
-            });
-            _res.on('end', function() {
-                resp = JSON.parse(str);
-                var appid = appIds[index].appid;
-                var ts = createTimeStamp();
-                var nonceStr = createNonceStr();
-                var ticket = resp.ticket;
-                var signature = calcSignature(ticket, nonceStr, ts, url);
-
-                cachedSignatures[md5(url)] = {
-                    nonceStr: nonceStr,
-                    timestamp: ts,
-                    appid: appid,
-                    signature: signature,
-                    url: url
-                };
-
-                responseWithJson(res, {
-                    nonceStr: nonceStr,
-                    timestamp: ts,
-                    appid: appid,
-                    signature: signature,
-                    url: url
-                });
-            });
-        });
-    };
-
     // 通过请求中带的index值来判断是公司运营的哪个公众平台
     function config(req, res) {
         console.log("---------------------------------------------------------");
@@ -140,39 +76,39 @@ module.exports = function(app) {
         };
         var body = getdata();
         var headers = req.headers;
-        var url =  body['url'] || headers['referer'];
+
+        var url = body['url'] || headers['referer'];
+        if(!url){
+            url  = "http://" + req.headers.host + req.originalUrl;
+        }
+        console.log("url : ", url);
         var signatureObj = cachedSignatures[md5(url)] || null;
-        console.log("url : ",url);
-        console.log("cache : ",signatureObj);
+        console.log("cache : ", signatureObj);
         // 如果缓存中已存在签名，则直接返回签名
-        if (signatureObj && signatureObj.timestamp) {
-            var t = createTimeStamp() - signatureObj.timestamp;
+        if (signatureObj && signatureObj.ts) {
+            var t = createTimeStamp() - signatureObj.ts;
             // 未过期，并且访问的是同一个地址
             // 判断地址是因为微信分享出去后会额外添加一些参数，地址就变了不符合签名规则，需重新生成签名
             if (t < expireTime && signatureObj.url == url) {
-                return responseWithJson(res, {
-                    nonceStr: signatureObj.nonceStr,
-                    timestamp: signatureObj.timestamp,
-                    appid: signatureObj.appid,
-                    signature: signatureObj.signature,
-                    url: signatureObj.url
-                });
+                return responseWithJson(res, signatureObj);
             } else {
                 delete cachedSignatures[url];
             }
         }
-        var index = 0;
-        // 获取微信签名所需的access_token
-        https.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + appIds[index].appid + '&secret=' + appIds[index].secret, function(_res) {
-            var str = '',
-                resp;
-            _res.on('data', function(data) {
-                str += data;
-            });
-            _res.on('end', function() {
-                resp = JSON.parse(str);
-                getTicket(url, index, res, resp);
-            });
+        api.getJsConfig({
+            debug: false,
+            jsApiList: [
+                'checkJsApi',
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage',
+                'onMenuShareQQ',
+                'onMenuShareWeibo'
+            ],
+            url: url
+        }, function(err, result) {
+            result.ts =  createTimeStamp();
+            cachedSignatures[md5(url)] = result;
+            responseWithJson(res, result);
         });
     };
     app.route('/config/wechat.js').get(config);
