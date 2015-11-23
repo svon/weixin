@@ -5,7 +5,5 @@
   try{
     window.wxShare && window.wxShare.ready(resp);
   }
-  catch(e){
-
-  }
+  catch(e){}
 })(arguments[0]);
