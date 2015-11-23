@@ -5,11 +5,33 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script src="http://beauty-assets.oss-cn-hangzhou.aliyuncs.com/tms/global/js/jquery.min2.0.3.js"></script>
 </head>
+
 <body>
-<div>
-    <h3>测试微信分享</h3>
-</div>
-<script type="text/javascript" src="/config/wechat.js"></script>
+    <div>
+        <h3>测试微信分享</h3>
+    </div>
+    <script src="//static.nodejs.so/js/base64.min.js"></script>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="//static.nodejs.so/share.js"></script>
+    <script type="text/javascript">
+    new function() {
+        wxShare.setDesc("螺旋仪 Demo ");
+        var date = new Date();
+        var hm = document.createElement("script");
+        var param = {
+            date: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
+            encode: true,
+            url: Base64.encode(window.location.href.split("#")[0])
+        };
+        var value = [];
+        for (var key in param) {
+            value.push(key + "=" + decodeURIComponent(param[key]));
+        }
+        hm.src = "//wx.nodejs.so/config/wechat.js?" + value.join("&");
+        var s = document.getElementsByTagName("head")[0];
+        s.appendChild(hm);
+    }();
+    </script>
 </body>
 
 </html>
